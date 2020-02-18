@@ -38,6 +38,7 @@ public class LabelsModel {
 	@ManyToMany()
 	@JoinTable(name="LableJoin", joinColumns=@JoinColumn(name="labelId")
     , inverseJoinColumns=@JoinColumn(name="noteId"))  
+	 @JsonIgnoreProperties(value = "labelModel")
 	private List<NoteModel> noteModel;
 
 	public int getLabelId() {
