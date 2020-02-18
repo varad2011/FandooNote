@@ -3,6 +3,7 @@ package com.bridgelabz.FundooNote.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,10 +41,27 @@ public class NoteController {
 		return response;
 	}
 	
-	@RequestMapping(method =  RequestMethod.GET, value = "/getAllNote")
-	public List<NoteModel> NoteList(String token) {
-		List<NoteModel> noteModel = service.Displaydata(token);
-		return  noteModel;
+	@RequestMapping(method =  RequestMethod.GET, value = "/noteName")
+	public List<NoteModel> sortList( @RequestParam String noteName, @RequestParam String token) {
+		List<NoteModel> noteModel = service.displayUserNotes(noteName, token);
+		return noteModel ;
 	}
 	
+	@RequestMapping(method =  RequestMethod.POST, value = "/trash")
+	public Response trash(@RequestParam Long noteId, @RequestParam String token) {
+		Response response = service.storeToTrash(noteId, token);
+		return response;
+	}
+	
+	@RequestMapping(method =  RequestMethod.POST, value = "/deleteFromTrash")
+	public Response deleteFromTrash(@RequestParam int noteId, @RequestParam String token) {
+		Response response = service.deleteFromTrash(noteId, token);
+		return response;
+	}
+	
+	@RequestMapping(method =  RequestMethod.POST, value = "/pinUnpin")
+	public Response pinUnpin(@RequestParam int noteId, @RequestParam String token) {
+		Response response = service.pinUnpin(noteId, token);
+		return response;
+	}
 }
