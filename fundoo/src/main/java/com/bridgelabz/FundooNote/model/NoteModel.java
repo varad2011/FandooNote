@@ -28,8 +28,21 @@ public class NoteModel {
 	private LocalDateTime atModified;
 	private boolean trash;
 	private boolean pinUnpin;
+	private boolean archieve;
+	private boolean archievePin; 
 	
-	
+	public boolean isArchieve() {
+		return archieve;
+	}
+	public void setArchieve(boolean archieve) {
+		this.archieve = archieve;
+	}
+	public boolean isArchievePin() {
+		return archievePin;
+	}
+	public void setArchievePin(boolean archievePin) {
+		this.archievePin = archievePin;
+	}
 	public boolean isTrash() {
 		return trash;
 	}
