@@ -30,6 +30,7 @@ public class LabelService {
 	@Autowired
 	private NoteRepository noteRepository;
 	
+	//new label create
 	public Response labelCreate(LabelsModel labelModel, String token) {
 		
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
@@ -50,6 +51,7 @@ public class LabelService {
 		}
 	}
 
+	//label delete base on label id
 	public Response labelDelete(LabelsModel labelsModel, String token) {
 		
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
@@ -65,6 +67,7 @@ public class LabelService {
 		}
 	}
 
+	//display list of label 
 	public List<LabelsModel> displayLabel( String token) {
 
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
@@ -79,6 +82,7 @@ public class LabelService {
 		}
 	}
 
+	//update label 
 	public Response labelUpdate(LabelsModel labelsModel, String token) {
 
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
@@ -97,7 +101,7 @@ public class LabelService {
 		}
 	}
 
-	
+	//add note to label
 	public Response addNoteToLabel(int noteId, int labelId, String token) {
 		  Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
 		  Optional<RegistrationModel>registrationModel =  registrationPagerepository.findById(id);
@@ -119,6 +123,7 @@ public class LabelService {
 		  }
 	}
 
+	//add label to note
 	public Response addLabelToNote(int noteId, int labelId, String token) {
 		  Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
 		  Optional<RegistrationModel>registrationModel =  registrationPagerepository.findById(id);
@@ -139,6 +144,4 @@ public class LabelService {
 		  return new Response(400, "fail to add note ", null); 
 		  }
 	}
-	
-
 }
