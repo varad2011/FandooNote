@@ -12,6 +12,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 @Entity
 public class NoteModel {
@@ -24,15 +26,32 @@ public class NoteModel {
 	private String content;
 	private LocalDateTime atCreated;
 	private LocalDateTime atModified;
+	private boolean trash;
+	private boolean pinUnpin;
+	
+	
+	public boolean isTrash() {
+		return trash;
+	}
+	public void setTrash(boolean trash) {
+		this.trash = trash;
+	}
+	public boolean isPinUnpin() {
+		return pinUnpin;
+	}
+	public void setPinUnpin(boolean pinUnpin) {
+		this.pinUnpin = pinUnpin;
+	}
 
-	  @ManyToOne
-	  @JoinColumn(name = "id") 
-	  private RegistrationModel model;
+	@ManyToOne
+	@JoinColumn(name = "id") 
+	private RegistrationModel model;
 	  
-	  @ManyToMany
-	  @JoinTable(name="LableJoin", joinColumns=@JoinColumn(name="noteId")
-	    , inverseJoinColumns=@JoinColumn(name="labelId"))  
-	  private List<LabelsModel> labelModel;
+	@ManyToMany
+	@JoinTable(name="LableJoin", joinColumns=@JoinColumn(name="noteId")
+	, inverseJoinColumns=@JoinColumn(name="labelId")) 
+	@JsonIgnoreProperties(value = "noteModel")
+	private List<LabelsModel> labelModel;
 	  
 	public int getNoteId() {
 		return noteId;
