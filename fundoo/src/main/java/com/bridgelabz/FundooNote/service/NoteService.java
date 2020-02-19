@@ -27,13 +27,6 @@ public class NoteService {
 	
 	@Autowired
 	private RegistrationPageRepository registrationPagerepository;
-	/*
-	 * 
-	 * @Autowired private RecycleBinRepository recyclebinRepository;
-	 * 
-	 * @Autowired private RecycleBinModel recycleBinModel;
-	 */
-	  
 	
 	//user availability check
 	  public boolean checkUserAvailability(String token) {
@@ -50,7 +43,6 @@ public class NoteService {
 			}
 	  }
 	
-	  
 	  //new note create
 	public Response createNewNote(NoteModel model, String token) {
 		
@@ -172,6 +164,22 @@ public class NoteService {
 		}
 	}
 
+	//untrash note
+	public Response trashToList(long noteId, String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
+		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId((int) noteId);
+		
+		if(registrationModel.isPresent()) {
+			noteModel.get().setTrash(false);
+			noteModel.get().setAtModified();
+			noteRepsitory.save(noteModel.get());
+			return new Response(200, "trash to list store successfully", null);
+		}else{
+			return new Response(400, "not trush to list", null);
+		}
+		
+	}
 	//delete notes from trash permanent deleted data 
 	public Response deleteFromTrash(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
@@ -251,4 +259,11 @@ public class NoteService {
 			return new Response(200, "not  unArchieve", null);
 		}
 	}
+
+	public Response collaborateWithEmailId(NoteModel model, String emailId, String token) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
 }
