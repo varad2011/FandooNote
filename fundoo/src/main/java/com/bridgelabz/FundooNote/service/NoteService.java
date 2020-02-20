@@ -121,6 +121,7 @@ public class NoteService {
 		if(registrationModel.isPresent()) {
 			List<NoteModel> noteModel = noteRepsitory.findAll();
 			List<NoteModel> noteModel1 = noteModel.stream().filter(t -> (t.getModel().getId())==(id)).collect(Collectors.toList());
+			
 			//System.out.println(noteModel);
 			return noteModel1;
 		}else {
@@ -260,10 +261,47 @@ public class NoteService {
 		}
 	}
 
-	public Response collaborateWithEmailId(NoteModel model, String emailId, String token) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean checkList(Optional<NoteModel> noteModel, String emailId) {
+		boolean condition = false;
+		for( int i = 0; i < noteModel.get().getRegistrationModel().size(); i++ ) {
+			if((noteModel.get().getRegistrationModel().get(i).getEmailId()).equals(emailId)) {
+				System.out.println("123 " +noteModel.get().getRegistrationModel().get(i).getEmailId());
+				return true;
+			}else {
+				return false;
+			}
+		}	
+		return condition;
 	}
-	
-	
+	//note collaborate
+	public Response collaborateWithEmailId(int noteId, String emailId, String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> owner = registrationPagerepository.findById(id);
+		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId(noteId);
+		Optional<RegistrationModel> user1 = registrationPagerepository.findByEmailId(emailId);
+		System.out.println(owner);
+		System.out.println(user1.toString());
+		System.out.println(noteModel.get().getModel());
+		System.out.println(noteModel.get().getRegistrationModel());
+		System.out.println();
+		System.out.println(((noteModel.get().getModel().getEmailId()).equalsIgnoreCase(emailId)));
+		System.out.println((noteModel.get().getRegistrationModel()).equals(user1));
+		
+		NoteService noteService = new NoteService();
+		boolean check = noteService.checkList(noteModel, emailId);
+			//System.out.println("loss " +noteModel.get().getRegistrationModel().get(i).getEmailId());
+		if(owner.isPresent()) {
+			if(check) {
+			
+				return new Response(400, "user already collaborate", null);
+			}else {
+				noteModel.get().getRegistrationModel().add(user1.get());
+			//	System.out.println(noteModel);
+				noteRepsitory.save(noteModel.get());
+				return new Response(200, "collabearator ", null);
+			}
+		}else {
+			return new Response(400, "user is not available", null);
+		}
+	}
 }
