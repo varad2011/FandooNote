@@ -81,8 +81,8 @@ public class NoteController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/collaborate")
-	public Response collaborator(@RequestBody NoteModel model, String emailId, String token) {
-		Response response = noteService.collaborateWithEmailId(model, emailId, token);
+	public Response collaborator(@RequestParam int  noteId, @RequestParam String emailId, @RequestParam String token) {
+		Response response = noteService.collaborateWithEmailId(noteId, emailId, token);
 		return response;
 	}
 }
