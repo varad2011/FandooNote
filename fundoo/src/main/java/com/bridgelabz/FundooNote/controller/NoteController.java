@@ -1,5 +1,6 @@
 package com.bridgelabz.FundooNote.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,5 +85,23 @@ public class NoteController {
 	public Response collaborator(@RequestParam int  noteId, @RequestParam String emailId, @RequestParam String token) {
 		Response response = noteService.collaborateWithEmailId(noteId, emailId, token);
 		return response;
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/reminderAdd")
+	public Response reminderAddToNote(@RequestParam int noteId, @RequestParam String datetime, @RequestParam String token ) {
+		
+		Response response = noteService.addReminder(noteId, datetime, token);
+		return response;
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/reminderRemove")
+	public Response removeReminderFromNote(@RequestParam int noteId, @RequestParam String token) {
+		Response response  = noteService.removeReminder(noteId, token);
+		return response;
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/getAllReminderNote")
+	public List<NoteModel> getAllReminderNote(@RequestParam String token) {
+		return  noteService.getAllReminderList(token);
 	}
 }
