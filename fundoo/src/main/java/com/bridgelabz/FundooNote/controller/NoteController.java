@@ -18,90 +18,92 @@ import com.bridgelabz.FundooNote.service.NoteService;
 
 @RestController
 public class NoteController {
-	
+
 	@Autowired
 	private NoteService noteService;
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/noteCreate")
 	public Response createNote(@RequestBody NoteModel model, @RequestParam String token) {
 		Response response = noteService.createNewNote(model, token);
 		return response;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteNote")
 	public Response deleteNote(@RequestBody NoteDto model, @RequestParam String token) {
 		Response response = noteService.deleteNote(model, token);
 		return response;
 	}
-	
-	@RequestMapping(method =  RequestMethod.POST, value = "/updateNote")
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateNote")
 	public Response update(@RequestBody NoteDto model, @RequestParam String token) {
 		Response response = noteService.updateNote(model, token);
 		return response;
 	}
-	
-	@RequestMapping(method =  RequestMethod.GET, value = "/noteName")
-	public List<NoteModel> sortList( @RequestParam String noteName, @RequestParam String token) {
+
+	@RequestMapping(method = RequestMethod.GET, value = "/noteName")
+	public List<NoteModel> sortList(@RequestParam String noteName, @RequestParam String token) {
 		List<NoteModel> noteModel = noteService.displayUserNotes(noteName, token);
-		return noteModel ;
+		return noteModel;
 	}
-	
-	@RequestMapping(method =  RequestMethod.POST, value = "/trash")
+
+	@RequestMapping(method = RequestMethod.POST, value = "/trash")
 	public Response trash(@RequestParam Long noteId, @RequestParam String token) {
 		Response response = noteService.storeToTrash(noteId, token);
 		return response;
 	}
-	
-	@RequestMapping(method =  RequestMethod.POST, value = "/trashToList")
+
+	@RequestMapping(method = RequestMethod.POST, value = "/trashToList")
 	public Response trashToList(@RequestParam Long noteId, @RequestParam String token) {
 		Response response = noteService.trashToList(noteId, token);
 		return response;
 	}
-	@RequestMapping(method =  RequestMethod.POST, value = "/deleteFromTrash")
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteFromTrash")
 	public Response deleteFromTrash(@RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.deleteFromTrash(noteId, token);
 		return response;
 	}
-	
-	@RequestMapping(method =  RequestMethod.POST, value = "/pinUnpin")
+
+	@RequestMapping(method = RequestMethod.POST, value = "/pinUnpin")
 	public Response pinUnpin(@RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.pinUnpin(noteId, token);
 		return response;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/addToArchieve")
-	public Response addToArchieve (@RequestParam int noteId, @RequestParam String token) {
+	public Response addToArchieve(@RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.addToArchieve(noteId, token);
 		return response;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/unArchieve")
 	public Response unArchieve(@RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.unArchieveNote(noteId, token);
 		return response;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/collaborate")
-	public Response collaborator(@RequestParam int  noteId, @RequestParam String emailId, @RequestParam String token) {
+	public Response collaborator(@RequestParam int noteId, @RequestParam String emailId, @RequestParam String token) {
 		Response response = noteService.collaborateWithEmailId(noteId, emailId, token);
 		return response;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/reminderAdd")
-	public Response reminderAddToNote(@RequestParam int noteId, @RequestParam String datetime, @RequestParam String token ) {
-		
+	public Response reminderAddToNote(@RequestParam int noteId, @RequestParam String datetime,
+			@RequestParam String token) {
+
 		Response response = noteService.addReminder(noteId, datetime, token);
 		return response;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/reminderRemove")
 	public Response removeReminderFromNote(@RequestParam int noteId, @RequestParam String token) {
-		Response response  = noteService.removeReminder(noteId, token);
+		Response response = noteService.removeReminder(noteId, token);
 		return response;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/getAllReminderNote")
 	public List<NoteModel> getAllReminderNote(@RequestParam String token) {
-		return  noteService.getAllReminderList(token);
+		return noteService.getAllReminderList(token);
 	}
 }
