@@ -7,13 +7,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.FundooNote.Util.TokenGeneratorDecoder;
 import com.bridgelabz.FundooNote.dto.NoteDto;
+import com.bridgelabz.FundooNote.model.CollaboratorOut;
 import com.bridgelabz.FundooNote.model.NoteModel;
 import com.bridgelabz.FundooNote.model.RegistrationModel;
+import com.bridgelabz.FundooNote.repository.CollaboratorRepository;
 import com.bridgelabz.FundooNote.repository.NoteRepository;
 import com.bridgelabz.FundooNote.repository.RegistrationPageRepository;
 import com.bridgelabz.FundooNote.response.Response;
@@ -30,8 +31,11 @@ public class NoteService {
 	@Autowired
 	private RegistrationPageRepository registrationPagerepository;
 
+	@Autowired
+	private CollaboratorRepository collaboratorRepository;
+
 	// user availability check
-	public boolean checkUserAvailability(String token) {
+	private boolean checkUserExit(String token) {
 		System.out.println(token);
 		String userId = tokenDecoder.decodeToken(token);
 		System.out.println(userId);
@@ -267,9 +271,17 @@ public class NoteService {
 			if (check) {
 				return new Response(400, "user already collaborate", null);
 			} else {
-				noteModel.get().getRegistrationModel().add(user1.get());
-				noteRepsitory.save(noteModel.get());
-				return new Response(200, "collabearator ", null);
+				if (user1.isPresent()) {
+					noteModel.get().getRegistrationModel().add(user1.get());
+					noteRepsitory.save(noteModel.get());
+					return new Response(200, "collabearator ", null);
+				} else {
+					CollaboratorOut collaboratorOut = new CollaboratorOut();
+					collaboratorOut.setNoteId(noteId);
+					collaboratorOut.setColEmaiId(emailId);
+					collaboratorRepository.save(collaboratorOut);
+					return new Response(200, "added to collaborator", null);
+				}
 			}
 		} else {
 			return new Response(400, "user is not available", null);
@@ -315,7 +327,7 @@ public class NoteService {
 	public List<NoteModel> getAllReminderList(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
-		if (UserExist.isPresent()) {
+		if (checkUserExit(token)) {
 			List<NoteModel> allNotes = noteRepsitory.findAll();
 			List<NoteModel> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
 					.collect(Collectors.toList());
@@ -332,10 +344,16 @@ public class NoteService {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
 		List<NoteModel> allNotes = noteRepsitory.findAll();
-		List<NoteModel> userAllNotes = allNotes.stream()
+		List<NoteModel> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
+				.collect(Collectors.toList());
+		List<NoteModel> reminderAllNotes = userAllNotes.stream()
 				.filter(i -> (i.getReminderDatTime()).equals(LocalDateTime.now())).collect(Collectors.toList());
-		if (!userAllNotes.isEmpty()) {
-			return userAllNotes;
+		if (checkUserExit(token)) {
+			if (!reminderAllNotes.isEmpty()) {
+				return reminderAllNotes;
+			} else {
+				return null;
+			}
 		} else {
 			return null;
 		}
