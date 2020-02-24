@@ -128,7 +128,9 @@ public class NoteService {
 		if (registrationModel.isPresent()) {
 			List<NoteModel> noteModel = noteRepsitory.findAll();
 			System.out.println(noteModel);
-			List<NoteModel> noteModel1 = noteModel.stream().filter(t -> t.getTitle().equals(name)).sorted()
+			List<NoteModel> userNoteList = noteModel.stream().filter(t -> (t.getNoteId()) == (id))
+					.collect(Collectors.toList());
+			List<NoteModel> noteModel1 = userNoteList.stream().filter(t -> t.getTitle().equals(name))
 					.collect(Collectors.toList());
 			return noteModel1;
 		} else {
@@ -304,7 +306,7 @@ public class NoteService {
 			noteRepsitory.save(noteCheck.get());
 			return new Response(200, "reminder added successfully", null);
 		} else {
-			return new Response(400, "use is not present in dataBase", null);
+			return new Response(400, "user is not present in dataBase", null);
 		}
 	}
 
@@ -339,7 +341,8 @@ public class NoteService {
 		}
 	}
 
-	// remind notes to user
+	// remind notes to user when settime == reminder time;
+	
 	public List<NoteModel> remindNotesToUser(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
@@ -356,6 +359,48 @@ public class NoteService {
 			}
 		} else {
 			return null;
+		}
+	}
+	
+	public boolean checkCollaboratorEmailList(Optional<CollaboratorOut> collaboratorListEmail, String emailId, int noteId) {
+		boolean condition = false;
+		for (int i = 0; i < collaboratorListEmail.get().getNoteList().size(); i++) {
+			if ((collaboratorListEmail.get().getNoteList().get(i).getNoteId()) == noteId) {
+				System.out.println((collaboratorListEmail.get().getNoteList().get(i).getNoteId()) == noteId);
+				System.out.println("123 " + (collaboratorListEmail.get().getNoteList().get(i).getNoteId()));
+				return condition = true;
+			} else {
+				condition = false;
+			}
+		}
+		return condition;
+	}
+	
+	public Response collaboratorUsingJoinTable(int noteId, String emailId, String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> owner = registrationPagerepository.findById(id);
+		Optional<RegistrationModel> emailIdUser = registrationPagerepository.findByEmailId(emailId);
+		Optional<CollaboratorOut> checkEmailId = collaboratorRepository.findByColEmaiId(emailId);
+		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId(noteId);
+		if(!checkEmailId.isPresent()) {
+			CollaboratorOut collaboratorOut = new CollaboratorOut();
+			collaboratorOut.setColEmaiId(emailId);
+			collaboratorRepository.save(collaboratorOut);
+			Optional<CollaboratorOut> findCollaboratorId = collaboratorRepository.findByColEmaiId(emailId);
+			noteModel.get().getCollaboratorOutsList().add(findCollaboratorId.get());
+			noteRepsitory.save(noteModel.get());
+			return new Response(200, "collaborated with new user", null);
+		}else {
+			boolean emailExitCheckWithNoteId = checkCollaboratorEmailList(checkEmailId, emailId, noteId);
+		//	System.out.println(checkEmailId.get().getNoteList());
+		//	System.out.println((checkEmailId.get().getNoteList()).equals(noteId));
+			if(emailExitCheckWithNoteId)	{
+				return new Response(200, "already collaboratoed ", null);
+			}else {
+				noteModel.get().getCollaboratorOutsList().add(checkEmailId.get());
+				noteRepsitory.save(noteModel.get());
+				return new Response(200, "collaborated with already available ", null);
+			}
 		}
 	}
 }
