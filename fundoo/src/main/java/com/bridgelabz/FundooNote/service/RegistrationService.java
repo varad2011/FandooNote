@@ -7,6 +7,8 @@ import java.util.Optional;
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.FundooNote.Util.JMSMail;
@@ -30,6 +32,9 @@ public class RegistrationService {
 
 	@Autowired
 	TokenServiceUtil tokenService;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	//new Registration method with mail configuration
 	public String newRegister(RegistrationModel model) throws MessagingException, IOException {
@@ -61,19 +66,18 @@ public class RegistrationService {
 	 */
 	public Response newRegisterEntry(RegistrationModel model) {
 		String emailId = model.getEmailId();
-		
-		try {
-			Optional<RegistrationModel>  newModel = registrationPageRepository.findByEmailId(emailId);
-			System.out.println(newModel);
-			if(newModel.isPresent()) {
-				return new Response(401, "unsuccessLogin", null);
-			}else{
-				registrationRepository.save(model);
-				email.sendEmail(null, "Registration done successfully", emailId, null);
-				return  new Response(200, "useLoginsuccess", null);
-			}
-		}catch(Exception e) {
-			return new Response(404, "unsuccessLogin", null);
+		String password = model.getPassword();
+
+		Optional<RegistrationModel> newModel = registrationPageRepository.findByEmailId(emailId);
+		System.out.println(newModel);
+
+		if (newModel.isPresent()) {
+			return new Response(401, "unsuccessRegistration", null);
+		} else {
+			model.setPassword(passwordEncoder.encode(password));
+			registrationRepository.save(model);
+			email.sendEmail(null, "Registration done successfully", emailId, null);
+			return new Response(200, "use Registration success", null);
 		}
 	}
 }
