@@ -36,34 +36,6 @@ public class RegistrationService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	//new Registration method with mail configuration
-	public String newRegister(RegistrationModel model) throws MessagingException, IOException {
-		String token = tokenService.createToken(model.getEmailId());
-		String subject = "registration successfully done";
-		registrationRepository.save(model);
-		email.sendEmail(token, subject, null, null);
-	//	email.sendEmailWithAttachment();
-		System.out.println("mail send successfully");
-		
-		return "user Registor successfully";
-	}
-
-	/*
-	 * //new registration using response t //response return http request public
-	 * Response newregister1(RegistrationModel model) throws
-	 * UnsupportedEncodingException {
-	 * 
-	 * String token = tokenService.createToken(model.getEmailId()); String emailId =
-	 * model.getEmailId(); System.out.println(emailId);
-	 * 
-	 * try { Optional<RegistrationModel> newModel =
-	 * registrationPageRepository.findByEmailId(emailId); if(!newModel.isPresent())
-	 * { registrationRepository.save(model); return new
-	 * Response("register successfully"); } } catch (Exception e) { return new
-	 * Response("nullvalue"); }
-	 * 
-	 * return new Response("user already register/n foget password"); }
-	 */
 	public Response newRegisterEntry(RegistrationModel model) {
 		String emailId = model.getEmailId();
 		String password = model.getPassword();
