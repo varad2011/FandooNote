@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -26,8 +27,8 @@ public class LabelsModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int  labelId;
-	
 	private String labelName;
+	@NotBlank
 	private LocalDateTime createDate;
 	private LocalDateTime updateDate;
 	
@@ -39,7 +40,7 @@ public class LabelsModel {
 	@JoinTable(name="LableJoin", joinColumns=@JoinColumn(name="labelId")
     , inverseJoinColumns=@JoinColumn(name="noteId"))  
 	 @JsonIgnoreProperties(value = "labelModel")
-	private List<NoteModel> noteModel;
+	private List<Note> noteModel;
 
 	public int getLabelId() {
 		return labelId;
@@ -65,11 +66,11 @@ public class LabelsModel {
 		this.registrationModel = registrationModel;
 	}
 
-	public List<NoteModel> getNoteModel() {
+	public List<Note> getNoteModel() {
 		return noteModel;
 	}
 
-	public void setNoteModel(List<NoteModel> noteModel) {
+	public void setNoteModel(List<Note> noteModel) {
 		this.noteModel = noteModel;
 	}
 

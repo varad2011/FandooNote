@@ -1,9 +1,15 @@
 package com.bridgelabz.FundooNote.service;
 
 
+import java.io.InputStream;
+
+import javax.servlet.ServletContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.ServletContextAware;
 
 import com.bridgelabz.FundooNote.Util.TokenGeneratorDecoder;
 import com.bridgelabz.FundooNote.dto.UserLoginDto;

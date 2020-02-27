@@ -1,8 +1,5 @@
 package com.bridgelabz.FundooNote.dto;
 
-import javax.persistence.Table;
-
-import org.springframework.stereotype.Component;
 
 public class UserLoginDto {
 

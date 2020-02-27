@@ -15,6 +15,7 @@ import com.bridgelabz.FundooNote.Util.JMSMail;
 import com.bridgelabz.FundooNote.Util.TokenServiceUtil;
 import com.bridgelabz.FundooNote.model.RegistrationModel;
 import com.bridgelabz.FundooNote.repository.RegistrationRepository;
+import com.bridgelabz.FundooNote.response.ErrorResponse;
 import com.bridgelabz.FundooNote.response.Response;
 import com.bridgelabz.FundooNote.repository.RegistrationPageRepository;
 
@@ -39,10 +40,8 @@ public class RegistrationService {
 	public Response newRegisterEntry(RegistrationModel model) {
 		String emailId = model.getEmailId();
 		String password = model.getPassword();
-
 		Optional<RegistrationModel> newModel = registrationPageRepository.findByEmailId(emailId);
 		System.out.println(newModel);
-
 		if (newModel.isPresent()) {
 			return new Response(401, "unsuccessRegistration", null);
 		} else {

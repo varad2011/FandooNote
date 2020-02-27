@@ -17,7 +17,7 @@ import com.bridgelabz.FundooNote.response.Response;
 public class ForgetPasswordService {
 	 
 	@Autowired
-	private RegistrationPageRepository registrationDao;
+	private RegistrationPageRepository registrationPageRepository;
 	
 	@Autowired
 	private RegistrationRepository RegistrationRepository;
@@ -29,7 +29,7 @@ public class ForgetPasswordService {
 	public boolean checkEmailId(ForgetPasswordDto passwordDto) {
 		//RegistrationModel model = registrationDao.findByEmailId(passwordDto.getEmailId());
 		String emailId = passwordDto.getEmailId();
-		Optional<RegistrationModel> model1 = registrationDao.findByEmailId(emailId);
+		Optional<RegistrationModel> model1 = registrationPageRepository.findByEmailId(emailId);
 		if(model1.isPresent()) {
 			return  true;
 		}
@@ -45,7 +45,7 @@ public class ForgetPasswordService {
 	public Response checkUserEmailId(ForgetPasswordDto passwordDto, String token) {
 		System.out.println(passwordDto.getEmailId());
 		String emailId = passwordDto.getEmailId();
-		Optional<RegistrationModel> model = registrationDao.findByEmailId(emailId);
+		Optional<RegistrationModel> model = registrationPageRepository.findByEmailId(emailId);
 		//RegistrationModel model = registrationDao.findByEmailId(passwordDto.getEmailId());
 		System.out.println(model);
 		

@@ -6,6 +6,7 @@ public class RegistrationModelDto {
 	private String mobileNumber;
 	private String emailId;
  	private String password;
+ 	
 	public String getUserName() {
 		return userName;
 	}

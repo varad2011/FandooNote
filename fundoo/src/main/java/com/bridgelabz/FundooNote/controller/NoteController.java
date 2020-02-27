@@ -1,10 +1,10 @@
 package com.bridgelabz.FundooNote.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.FundooNote.dto.NoteDto;
-import com.bridgelabz.FundooNote.model.NoteModel;
+import com.bridgelabz.FundooNote.model.Note;
 import com.bridgelabz.FundooNote.response.Response;
 import com.bridgelabz.FundooNote.service.NoteService;
 
@@ -23,7 +23,7 @@ public class NoteController {
 	private NoteService noteService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/noteCreate")
-	public Response createNote(@RequestBody NoteModel model, @RequestParam String token) {
+	public Response createNote(@Valid @RequestBody Note model, @RequestParam String token) {
 		Response response = noteService.createNewNote(model, token);
 		return response;
 	}
@@ -41,8 +41,8 @@ public class NoteController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/noteName")
-	public List<NoteModel> sortList(@RequestParam String noteName, @RequestParam String token) {
-		List<NoteModel> noteModel = noteService.displayUserNotes(noteName, token);
+	public List<Note> sortList(@RequestParam String noteName, @RequestParam String token) {
+		List<Note> noteModel = noteService.displayUserNotes(noteName, token);
 		return noteModel;
 	}
 
@@ -88,6 +88,12 @@ public class NoteController {
 		return response;
 	}
 
+	@RequestMapping(method = RequestMethod.POST, value = "/collaborateEmailId")
+	public Response collaboratorWithEmailList(@RequestParam int noteId, @RequestParam String emailId, @RequestParam String token) {
+		Response response = noteService.collaboratorUsingJoinTable(noteId, emailId, token);
+		return response;
+	}
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/reminderAdd")
 	public Response reminderAddToNote(@RequestParam int noteId, @RequestParam String datetime,
 			@RequestParam String token) {
@@ -97,13 +103,15 @@ public class NoteController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/reminderRemove")
-	public Response removeReminderFromNote(@RequestParam int noteId, @RequestParam String token) {
+	public Response removeReminderFromNote(@Valid @RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.removeReminder(noteId, token);
 		return response;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getAllReminderNote")
-	public List<NoteModel> getAllReminderNote(@RequestParam String token) {
+	public List<Note> getAllReminderNote(@RequestParam String token) {
 		return noteService.getAllReminderList(token);
 	}
+	
+	
 }

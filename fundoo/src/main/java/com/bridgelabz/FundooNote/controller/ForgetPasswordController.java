@@ -17,7 +17,7 @@ import com.bridgelabz.FundooNote.service.RegistrationService;
 public class ForgetPasswordController {
 
 	@Autowired
-	ForgetPasswordService service;
+	ForgetPasswordService forgetPasswordService;
 	
 	/*
 	 * @RequestMapping(method = RequestMethod.POST, value = "/emailId") public
@@ -29,12 +29,12 @@ public class ForgetPasswordController {
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/resetLink")
 	public Response resetPassword(@RequestBody ForgetPasswordDto passwordDto, String  token ) {
-		Response response = service.checkUserEmailId(passwordDto, token);
+		Response response = forgetPasswordService.checkUserEmailId(passwordDto, token);
 		return response;
 	}
 	@RequestMapping(method = RequestMethod.POST, value = "/resetPage")
 	public Response forgetUserPassword(@RequestBody UserLoginDto resetPasswordDto) {
-		Response response = service.updatePassword(resetPasswordDto);
+		Response response = forgetPasswordService.updatePassword(resetPasswordDto);
 		return response;
 	}
 }

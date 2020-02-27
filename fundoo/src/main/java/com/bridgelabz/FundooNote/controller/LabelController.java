@@ -19,42 +19,42 @@ import com.bridgelabz.FundooNote.service.LabelService;
 public class LabelController {
 
 	@Autowired
-	LabelService service;
+	LabelService labelService;
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/labelCreate")
 	public Response AddLabel(@RequestBody LabelsModel labelModel, @RequestParam String token) {
 		System.out.println(labelModel);
-		Response response = service.labelCreate(labelModel, token);
+		Response response = labelService.labelCreate(labelModel, token);
 		return response;
 	}
 	
 	@PostMapping(value = "/labelDelete" )
 	public Response deleteLabel(@RequestBody LabelsModel labelsModel,@RequestParam String token) {
-		Response response = service.labelDelete(labelsModel, token);
+		Response response = labelService.labelDelete(labelsModel, token);
 		return response;
 	}
 	
 	@GetMapping(value = "/labelDisplay" )
 	public List<LabelsModel> displayLabel(@RequestParam String token) {
 		
-		return  service.displayLabel(token);
+		return  labelService.displayLabel(token);
 	}
 	
 	@PostMapping(value = "/labelUpdate" )
 	public Response updateLabel(@RequestBody LabelsModel labelsModel, @RequestParam String token) {
-		Response response = service.labelUpdate(labelsModel, token);
+		Response response = labelService.labelUpdate(labelsModel, token);
 		return response;
 	}
 	
 	@PostMapping(value = "/AddNoteToLabel" )
 	public Response AddNoteToLabel(@RequestParam int noteId, @RequestParam int labelId, @RequestParam String token) {
-		Response response = service.addNoteToLabel(noteId, labelId, token);
+		Response response = labelService.addNoteToLabel(noteId, labelId, token);
 		return response;
 	}
 	
 	@PostMapping(value = "/AddToLabelToNote" )
 	public Response addToLabelToNote(@RequestParam int noteId, @RequestParam int labelId, @RequestParam String token) {
-		Response response = service.addLabelToNote(noteId,  labelId, token);
+		Response response = labelService.addLabelToNote(noteId,  labelId, token);
 		return response;
 	}
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.bridgelabz.FundooNote.Util.TokenGeneratorDecoder;
 import com.bridgelabz.FundooNote.dto.NoteDto;
 import com.bridgelabz.FundooNote.model.CollaboratorOut;
-import com.bridgelabz.FundooNote.model.NoteModel;
+import com.bridgelabz.FundooNote.model.Note;
 import com.bridgelabz.FundooNote.model.RegistrationModel;
 import com.bridgelabz.FundooNote.repository.CollaboratorRepository;
 import com.bridgelabz.FundooNote.repository.NoteRepository;
@@ -49,7 +49,7 @@ public class NoteService {
 	}
 
 	// new note create
-	public Response createNewNote(NoteModel model, String token) {
+	public Response createNewNote(Note model, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		try {
 			Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
@@ -90,7 +90,7 @@ public class NoteService {
 		long noteId = model.getNoteId();
 		try {
 			Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-			Optional<NoteModel> noteModel = noteRepsitory.findById((int) noteId);
+			Optional<Note> noteModel = noteRepsitory.findById((int) noteId);
 
 			if (registrationModel.isPresent()) {
 				noteModel.get().setTitle(model.getTitle());
@@ -107,12 +107,12 @@ public class NoteService {
 	}
 
 	// display all user create Notes
-	public List<NoteModel> displayNote(String token) {
+	public List<Note> displayNote(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
 		if (registrationModel.isPresent()) {
-			List<NoteModel> noteModel = noteRepsitory.findAll();
-			List<NoteModel> noteModel1 = noteModel.stream().filter(t -> (t.getModel().getId()) == (id))
+			List<Note> noteModel = noteRepsitory.findAll();
+			List<Note> noteModel1 = noteModel.stream().filter(t -> (t.getModel().getId()) == (id))
 					.collect(Collectors.toList());
 			// System.out.println(noteModel);
 			return noteModel1;
@@ -122,15 +122,15 @@ public class NoteService {
 	}
 
 	// Sort note by list
-	public List<NoteModel> displayUserNotes(String name, String token) {
+	public List<Note> displayUserNotes(String name, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
 		if (registrationModel.isPresent()) {
-			List<NoteModel> noteModel = noteRepsitory.findAll();
+			List<Note> noteModel = noteRepsitory.findAll();
 			System.out.println(noteModel);
-			List<NoteModel> userNoteList = noteModel.stream().filter(t -> (t.getNoteId()) == (id))
+			List<Note> userNoteList = noteModel.stream().filter(t -> (t.getNoteId()) == (id))
 					.collect(Collectors.toList());
-			List<NoteModel> noteModel1 = userNoteList.stream().filter(t -> t.getTitle().equals(name))
+			List<Note> noteModel1 = userNoteList.stream().filter(t -> t.getTitle().equals(name))
 					.collect(Collectors.toList());
 			return noteModel1;
 		} else {
@@ -142,7 +142,7 @@ public class NoteService {
 	public Response storeToTrash(long noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId((int) noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId((int) noteId);
 		if (registrationModel.isPresent()) {
 			if (noteModel.get().isPinUnpin()) {
 
@@ -161,7 +161,7 @@ public class NoteService {
 	public Response trashToList(long noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId((int) noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId((int) noteId);
 		if (registrationModel.isPresent()) {
 			noteModel.get().setTrash(false);
 			noteModel.get().setAtModified();
@@ -172,12 +172,12 @@ public class NoteService {
 		}
 
 	}
-
+	
 	// delete notes from trash permanent deleted data
 	public Response deleteFromTrash(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId(noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
 
 		if ((registrationModel.isPresent()) && (noteModel.get().isTrash())) {
 			noteRepsitory.deleteById(noteId);
@@ -193,7 +193,7 @@ public class NoteService {
 	public Response pinUnpin(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId(noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
 		if (registrationModel.isPresent()) {
 			if (!noteModel.get().isPinUnpin()) {
 				noteModel.get().setPinUnpin(true);
@@ -212,7 +212,7 @@ public class NoteService {
 	public Response addToArchieve(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId((int) noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId((int) noteId);
 
 		if ((registrationModel.isPresent()) && (!noteModel.get().isTrash())) {
 
@@ -233,7 +233,7 @@ public class NoteService {
 	public Response unArchieveNote(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId((int) noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId((int) noteId);
 		if (registrationModel.isPresent()) {
 			if (noteModel.get().isArchievePin()) {
 				noteModel.get().setPinUnpin(true);
@@ -248,7 +248,7 @@ public class NoteService {
 	}
 
 	// check boolean condition --emailId is already collaborate or not
-	public boolean checkList(Optional<NoteModel> noteModel, String emailId) {
+	public boolean checkList(Optional<Note> noteModel, String emailId) {
 		boolean condition = false;
 		for (int i = 0; i < noteModel.get().getRegistrationModel().size(); i++) {
 			if ((noteModel.get().getRegistrationModel().get(i).getEmailId()).equals(emailId)) {
@@ -265,7 +265,7 @@ public class NoteService {
 	public Response collaborateWithEmailId(int noteId, String emailId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> owner = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId(noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
 		Optional<RegistrationModel> user1 = registrationPagerepository.findByEmailId(emailId);
 		NoteService noteService = new NoteService();
 		boolean check = noteService.checkList(noteModel, emailId);
@@ -279,7 +279,6 @@ public class NoteService {
 					return new Response(200, "collabearator ", null);
 				} else {
 					CollaboratorOut collaboratorOut = new CollaboratorOut();
-					collaboratorOut.setNoteId(noteId);
 					collaboratorOut.setColEmaiId(emailId);
 					collaboratorRepository.save(collaboratorOut);
 					return new Response(200, "added to collaborator", null);
@@ -292,13 +291,11 @@ public class NoteService {
 
 	// added reminder to note
 	public Response addReminder(int noteId, String datetime, String token) {
-		// System.out.println(datetime);
-		// SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		LocalDateTime dateTime = LocalDateTime.parse(datetime, formatter);
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteCheck = noteRepsitory.findByNoteId(noteId);
+		Optional<Note> noteCheck = noteRepsitory.findByNoteId(noteId);
 		System.out.println(noteCheck.get());
 		if (UserExist.isPresent()) {
 			noteCheck.get().setNoteReminder(true);
@@ -314,7 +311,7 @@ public class NoteService {
 	public Response removeReminder(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
-		Optional<NoteModel> noteCheck = noteRepsitory.findByNoteId(noteId);
+		Optional<Note> noteCheck = noteRepsitory.findByNoteId(noteId);
 		if (UserExist.isPresent()) {
 			noteCheck.get().setNoteReminder(false);
 			noteCheck.get().setReminderDatTime(null);
@@ -326,14 +323,14 @@ public class NoteService {
 	}
 
 	// reminder set notes display for login user
-	public List<NoteModel> getAllReminderList(String token) {
+	public List<Note> getAllReminderList(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
 		if (checkUserExit(token)) {
-			List<NoteModel> allNotes = noteRepsitory.findAll();
-			List<NoteModel> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
+			List<Note> allNotes = noteRepsitory.findAll();
+			List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
 					.collect(Collectors.toList());
-			List<NoteModel> reminderSetNotes = userAllNotes.stream().filter(i -> (i.isNoteReminder()))
+			List<Note> reminderSetNotes = userAllNotes.stream().filter(i -> (i.isNoteReminder()))
 					.collect(Collectors.toList());
 			return reminderSetNotes;
 		} else {
@@ -343,13 +340,12 @@ public class NoteService {
 
 	// remind notes to user when settime == reminder time;
 	
-	public List<NoteModel> remindNotesToUser(String token) {
+	public List<Note> remindNotesToUser(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
-		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
-		List<NoteModel> allNotes = noteRepsitory.findAll();
-		List<NoteModel> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
+		List<Note> allNotes = noteRepsitory.findAll();
+		List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
 				.collect(Collectors.toList());
-		List<NoteModel> reminderAllNotes = userAllNotes.stream()
+		List<Note> reminderAllNotes = userAllNotes.stream()
 				.filter(i -> (i.getReminderDatTime()).equals(LocalDateTime.now())).collect(Collectors.toList());
 		if (checkUserExit(token)) {
 			if (!reminderAllNotes.isEmpty()) {
@@ -381,7 +377,7 @@ public class NoteService {
 		Optional<RegistrationModel> owner = registrationPagerepository.findById(id);
 		Optional<RegistrationModel> emailIdUser = registrationPagerepository.findByEmailId(emailId);
 		Optional<CollaboratorOut> checkEmailId = collaboratorRepository.findByColEmaiId(emailId);
-		Optional<NoteModel> noteModel = noteRepsitory.findByNoteId(noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
 		if(!checkEmailId.isPresent()) {
 			CollaboratorOut collaboratorOut = new CollaboratorOut();
 			collaboratorOut.setColEmaiId(emailId);
@@ -392,8 +388,6 @@ public class NoteService {
 			return new Response(200, "collaborated with new user", null);
 		}else {
 			boolean emailExitCheckWithNoteId = checkCollaboratorEmailList(checkEmailId, emailId, noteId);
-		//	System.out.println(checkEmailId.get().getNoteList());
-		//	System.out.println((checkEmailId.get().getNoteList()).equals(noteId));
 			if(emailExitCheckWithNoteId)	{
 				return new Response(200, "already collaboratoed ", null);
 			}else {
