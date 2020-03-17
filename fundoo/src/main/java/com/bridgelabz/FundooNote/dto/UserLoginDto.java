@@ -1,9 +1,12 @@
 package com.bridgelabz.FundooNote.dto;
 
+import javax.validation.constraints.NotEmpty;
 
 public class UserLoginDto {
 
+	@NotEmpty(message = " emailId: not empty")
 	private String emailId;
+	@NotEmpty(message = " password: not empty")
  	private String password;
  	
 	public String getEmailId() {

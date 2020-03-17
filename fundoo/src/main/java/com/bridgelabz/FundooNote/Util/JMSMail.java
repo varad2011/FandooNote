@@ -25,7 +25,7 @@ public class JMSMail  {
 		msg.setSubject(subject);
 	
 			//http://localhost:8080/"+"token?
-			msg.setText(text +token);
+			msg.setText(text);
 	
 		javaMailSender.send(msg);
 	}

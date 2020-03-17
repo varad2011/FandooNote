@@ -1,13 +1,8 @@
 package com.bridgelabz.FundooNote.service;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
-import javax.mail.MessagingException;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +10,6 @@ import com.bridgelabz.FundooNote.Util.JMSMail;
 import com.bridgelabz.FundooNote.Util.TokenServiceUtil;
 import com.bridgelabz.FundooNote.model.RegistrationModel;
 import com.bridgelabz.FundooNote.repository.RegistrationRepository;
-import com.bridgelabz.FundooNote.response.ErrorResponse;
 import com.bridgelabz.FundooNote.response.Response;
 import com.bridgelabz.FundooNote.repository.RegistrationPageRepository;
 
@@ -46,8 +40,9 @@ public class RegistrationService {
 			return new Response(401, "unsuccessRegistration", null);
 		} else {
 			model.setPassword(passwordEncoder.encode(password));
+			System.out.println(model.toString());
 			registrationRepository.save(model);
-			email.sendEmail(null, "Registration done successfully", emailId, null);
+		//	email.sendEmail(null, "Registration done successfully", emailId, null);
 			return new Response(200, "use Registration success", null);
 		}
 	}

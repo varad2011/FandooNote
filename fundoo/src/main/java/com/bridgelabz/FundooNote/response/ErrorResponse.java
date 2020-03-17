@@ -7,13 +7,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name =  "error")
 public class ErrorResponse {
 
-	private String msg;
+	private String message;
 	private List<String> details;
-	public String getMsg() {
-		return msg;
+	public String getMessage() {
+		return message;
 	}
-	public void setMsg(String msg) {
-		this.msg = msg;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	public List<String> getDetails() {
 		return details;
@@ -21,9 +21,9 @@ public class ErrorResponse {
 	public void setDetails(List<String> details) {
 		this.details = details;
 	}
-	public ErrorResponse(String msg, List<String> details) {
+	public ErrorResponse(String message, List<String> details) {
 		super();
-		this.msg = msg;
+		this.message = message;
 		this.details = details;
 	}
 	

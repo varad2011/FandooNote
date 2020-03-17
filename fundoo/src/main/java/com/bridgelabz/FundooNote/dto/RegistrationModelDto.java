@@ -37,5 +37,10 @@ public class RegistrationModelDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	@Override
+	public String toString() {
+		return "RegistrationModelDto [userName=" + userName + ", lastName=" + lastName + ", mobileNumber="
+				+ mobileNumber + ", emailId=" + emailId + ", password=" + password + "]";
+	}
  	
 }

@@ -2,6 +2,7 @@ package com.bridgelabz.FundooNote.model;
 
 
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,21 +23,22 @@ public class RegistrationModel {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
 	
-	@Pattern(regexp = "^[a-z0-9_-]{2,15}$", message = "not n valid pattern" )
+	@NotBlank
+	@Pattern(regexp = "^[a-z0-9_-]{2,15}$", message = " userName : not in range " )
 	private String userName;
 	
 	private String lastName;
 	
 	@NotBlank
-	@Pattern(regexp = "^[0][1-9]\\d{9}$|^[1-9]\\d{9}$", message = "only number accept here")
+	@Pattern(regexp = "^[0][1-9]\\d{9}$|^[1-9]\\d{9}$", message = "MobileNumber : only number accept here")
 	private String mobileNumber;
 
 	@NotBlank
-	@Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = "enter valid email ID")
+	@Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+)$", message = " emailId : enter valid email ID ")
 	private String emailId;
 	
 	@NotBlank
-	@Size(min = 8, max = 20, message = "enter password in range {min} and {max}")
+	@Size(min = 8,max = 100, message = "password : enter password in range {min} and {max}")
  	private String password;
  	
  	@ManyToMany(cascade=CascadeType.ALL)
@@ -45,6 +47,20 @@ public class RegistrationModel {
  	@JsonIgnoreProperties(value = "registrationModel")
  	private List<Note> noteModel;
  	
+ 	private String profilePic;
+ 	
+	public String getProfilePic() {
+		return profilePic;
+	}
+	public void setProfilePic(String profilePic) {
+		this.profilePic = profilePic;
+	}
+	public List<Note> getNoteModel() {
+		return noteModel;
+	}
+	public void setNoteModel(List<Note> noteModel) {
+		this.noteModel = noteModel;
+	}
 	public long getId() {
 		return id;
 	}

@@ -1,6 +1,7 @@
 package com.bridgelabz.FundooNote.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,6 +12,8 @@ import com.bridgelabz.FundooNote.response.Response;
 import com.bridgelabz.FundooNote.service.LoginService;
 
 @RestController
+@CrossOrigin
+@RequestMapping("/login")
 public class loginController {
 
 	@Autowired

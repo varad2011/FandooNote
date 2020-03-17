@@ -16,6 +16,7 @@ import com.bridgelabz.FundooNote.response.Response;
 import com.bridgelabz.FundooNote.service.LabelService;
 
 @RestController
+@RequestMapping("/service")
 public class LabelController {
 
 	@Autowired

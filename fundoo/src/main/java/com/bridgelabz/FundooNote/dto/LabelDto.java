@@ -1,7 +1,5 @@
 package com.bridgelabz.FundooNote.dto;
 
-import org.springframework.stereotype.Component;
-
 public class LabelDto {
 
 	private String labelName;

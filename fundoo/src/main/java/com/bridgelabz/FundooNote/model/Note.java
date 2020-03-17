@@ -1,5 +1,6 @@
 package com.bridgelabz.FundooNote.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,10 +28,10 @@ public class Note {
 	private String title;
 	@NotBlank
 	private String content;
-	@NotBlank
 	private LocalDateTime atCreated;
 	private LocalDateTime atModified;
 	private boolean trash;
+	private LocalDate trashDate;
 	private boolean pinUnpin;
 	private boolean archieve;
 	private boolean archievePin; 
@@ -65,6 +65,14 @@ public class Note {
 	}
 	public void setCollaboratorOutsList(List<CollaboratorOut> collaboratorOutsList) {
 		this.collaboratorOutsList = collaboratorOutsList;
+	}
+	
+	
+	public LocalDate getTrashDate() {
+		return trashDate;
+	}
+	public void setTrashDate() {
+		this.trashDate= LocalDate.now().plusDays(30);
 	}
 	public boolean isNoteReminder() {
 		return noteReminder;
@@ -143,18 +151,18 @@ public class Note {
 		return atCreated;
 	}
 	public void setAtCreated() {
-		this.atCreated = atCreated.now();
+		this.atCreated = LocalDateTime.now();
 	}
 	public LocalDateTime getAtModified() {
 		return atModified;
 	}
 	public void setAtModified() {
-		this.atModified = atModified.now();
+		this.atModified = LocalDateTime.now();
 	}
 
 	@Override
 	public String toString() {
 		return "NoteModel [noteId=" + noteId + ", title=" + title + ", content=" + content + ", atCreated=" + atCreated
-				+ ", atModified=" + atModified + ", model=" + model + ", labelModel=" + labelModel + "]";
+				+ ", atModified=" + atModified;
 	}
 }

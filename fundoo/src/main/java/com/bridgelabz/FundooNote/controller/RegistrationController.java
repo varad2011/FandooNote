@@ -3,6 +3,7 @@ package com.bridgelabz.FundooNote.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +14,8 @@ import com.bridgelabz.FundooNote.response.Response;
 import com.bridgelabz.FundooNote.service.RegistrationService;
 
 @RestController
+@CrossOrigin
+@RequestMapping("/registration")
 public class RegistrationController {
 	
 	@Autowired

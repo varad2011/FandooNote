@@ -1,13 +1,22 @@
 package com.bridgelabz.FundooNote.service;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bridgelabz.FundooNote.Util.TokenGeneratorDecoder;
 import com.bridgelabz.FundooNote.dto.NoteDto;
@@ -18,6 +27,9 @@ import com.bridgelabz.FundooNote.repository.CollaboratorRepository;
 import com.bridgelabz.FundooNote.repository.NoteRepository;
 import com.bridgelabz.FundooNote.repository.RegistrationPageRepository;
 import com.bridgelabz.FundooNote.response.Response;
+import com.cloudinary.Cloudinary;
+//import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 @Service
 public class NoteService {
@@ -50,6 +62,7 @@ public class NoteService {
 
 	// new note create
 	public Response createNewNote(Note model, String token) {
+		System.out.println("token" + token);
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		try {
 			Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
@@ -62,7 +75,7 @@ public class NoteService {
 				return new Response(400, "envalid token", token);
 			}
 		} catch (Exception e) {
-			return new Response(500, "e", token);
+			return new Response(500, "e", null);
 		}
 	}
 
@@ -107,34 +120,33 @@ public class NoteService {
 	}
 
 	// display all user create Notes
-	public List<Note> displayNote(String token) {
+	public Response displayUserNote(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
 		if (registrationModel.isPresent()) {
-			List<Note> noteModel = noteRepsitory.findAll();
-			List<Note> noteModel1 = noteModel.stream().filter(t -> (t.getModel().getId()) == (id))
+			List<Note> noteList = noteRepsitory.findAll();
+			List<Note> noteModel1 = noteList.stream().filter(t -> (t.getModel().getId()) == (id))
 					.collect(Collectors.toList());
-			// System.out.println(noteModel);
-			return noteModel1;
+			System.out.println(noteModel1);
+			return new Response(200, "display Note successfully", noteModel1);
 		} else {
-			return null;
+			return new Response(200, "Empty List", null);
 		}
 	}
 
-	// Sort note by list
-	public List<Note> displayUserNotes(String name, String token) {
+	// Sort note by note name
+	public Response displayUserNotesName(String name, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
 		if (registrationModel.isPresent()) {
 			List<Note> noteModel = noteRepsitory.findAll();
-			System.out.println(noteModel);
-			List<Note> userNoteList = noteModel.stream().filter(t -> (t.getNoteId()) == (id))
+			List<Note> userNoteList = noteModel.stream().filter(t -> (t.getModel().getId() == (id)))
 					.collect(Collectors.toList());
 			List<Note> noteModel1 = userNoteList.stream().filter(t -> t.getTitle().equals(name))
 					.collect(Collectors.toList());
-			return noteModel1;
+			return new Response(200, "display Note successfully", noteModel1);
 		} else {
-			return null;
+			return new Response(200, "Empty List", null);
 		}
 	}
 
@@ -172,7 +184,7 @@ public class NoteService {
 		}
 
 	}
-	
+
 	// delete notes from trash permanent deleted data
 	public Response deleteFromTrash(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
@@ -191,6 +203,7 @@ public class NoteService {
 	// pin unpin notes
 	// if note is pin then unpin it or if note is unpin then pin it
 	public Response pinUnpin(int noteId, String token) {
+		System.out.println("pin unpin" +noteId);
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
 		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
@@ -212,7 +225,7 @@ public class NoteService {
 	public Response addToArchieve(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<Note> noteModel = noteRepsitory.findByNoteId((int) noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
 
 		if ((registrationModel.isPresent()) && (!noteModel.get().isTrash())) {
 
@@ -233,7 +246,7 @@ public class NoteService {
 	public Response unArchieveNote(int noteId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-		Optional<Note> noteModel = noteRepsitory.findByNoteId((int) noteId);
+		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
 		if (registrationModel.isPresent()) {
 			if (noteModel.get().isArchievePin()) {
 				noteModel.get().setPinUnpin(true);
@@ -323,7 +336,17 @@ public class NoteService {
 	}
 
 	// reminder set notes display for login user
-	public List<Note> getAllReminderList(String token) {
+	/*
+	 * public Response getAllReminderList(String token) { long id =
+	 * Long.parseLong(tokenDecoder.decodeToken(token)); Optional<RegistrationModel>
+	 * UserExist = registrationPagerepository.findById(id); if
+	 * (checkUserExit(token)) { List<Note> allNotes = noteRepsitory.findAll();
+	 * List<Note> userAllNotes = allNotes.stream().filter(i ->
+	 * (i.getModel().getId()) == (id)) .collect(Collectors.toList()); List<Note>
+	 * reminderSetNotes = userAllNotes.stream().filter(i -> (i.isNoteReminder()))
+	 * .collect(Collectors.toList()); }
+	 */
+	public Response getAllReminderList(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
 		if (checkUserExit(token)) {
@@ -332,14 +355,14 @@ public class NoteService {
 					.collect(Collectors.toList());
 			List<Note> reminderSetNotes = userAllNotes.stream().filter(i -> (i.isNoteReminder()))
 					.collect(Collectors.toList());
-			return reminderSetNotes;
+			return new Response(400, "use is not present in dataBase", reminderSetNotes);
 		} else {
-			return null;
+			return new Response(400, "list is empty", null);
 		}
 	}
 
 	// remind notes to user when settime == reminder time;
-	
+
 	public List<Note> remindNotesToUser(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		List<Note> allNotes = noteRepsitory.findAll();
@@ -357,8 +380,9 @@ public class NoteService {
 			return null;
 		}
 	}
-	
-	public boolean checkCollaboratorEmailList(Optional<CollaboratorOut> collaboratorListEmail, String emailId, int noteId) {
+
+	public boolean checkCollaboratorEmailList(Optional<CollaboratorOut> collaboratorListEmail, String emailId,
+			int noteId) {
 		boolean condition = false;
 		for (int i = 0; i < collaboratorListEmail.get().getNoteList().size(); i++) {
 			if ((collaboratorListEmail.get().getNoteList().get(i).getNoteId()) == noteId) {
@@ -371,14 +395,14 @@ public class NoteService {
 		}
 		return condition;
 	}
-	
+
 	public Response collaboratorUsingJoinTable(int noteId, String emailId, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		Optional<RegistrationModel> owner = registrationPagerepository.findById(id);
 		Optional<RegistrationModel> emailIdUser = registrationPagerepository.findByEmailId(emailId);
 		Optional<CollaboratorOut> checkEmailId = collaboratorRepository.findByColEmaiId(emailId);
 		Optional<Note> noteModel = noteRepsitory.findByNoteId(noteId);
-		if(!checkEmailId.isPresent()) {
+		if (!checkEmailId.isPresent()) {
 			CollaboratorOut collaboratorOut = new CollaboratorOut();
 			collaboratorOut.setColEmaiId(emailId);
 			collaboratorRepository.save(collaboratorOut);
@@ -386,15 +410,76 @@ public class NoteService {
 			noteModel.get().getCollaboratorOutsList().add(findCollaboratorId.get());
 			noteRepsitory.save(noteModel.get());
 			return new Response(200, "collaborated with new user", null);
-		}else {
+		} else {
 			boolean emailExitCheckWithNoteId = checkCollaboratorEmailList(checkEmailId, emailId, noteId);
-			if(emailExitCheckWithNoteId)	{
+			if (emailExitCheckWithNoteId) {
 				return new Response(200, "already collaboratoed ", null);
-			}else {
+			} else {
 				noteModel.get().getCollaboratorOutsList().add(checkEmailId.get());
 				noteRepsitory.save(noteModel.get());
 				return new Response(200, "collaborated with already available ", null);
 			}
+		}
+	}
+
+	public Response uploadProPic(MultipartFile file, String token) throws IOException {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> loginUser = registrationPagerepository.findById(id);
+		if (checkUserExit(token)) {
+			File uploadFile = new File(file.getOriginalFilename());
+			BufferedOutputStream outStream = new BufferedOutputStream(new FileOutputStream(uploadFile));
+			outStream.write(file.getBytes());
+			outStream.close();
+			Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap("cloud_name", "patilvarad2011", "api_key",
+					"814469859839278", "api_secret", "xyd8OV451Efmc9DvwFKL0xxNfi4"));
+			Map<?, ?> uploadProfile;
+			uploadProfile = cloudinary.uploader().upload(uploadFile, ObjectUtils.emptyMap());
+			loginUser.get().setProfilePic(uploadProfile.get("secure_url").toString());
+			registrationPagerepository.save(loginUser.get());
+			return new Response(200, "imageUploaded successfully", null);
+		} else {
+			return new Response(200, "some issues are here", null);
+		}
+	}
+
+	@Scheduled(cron = "0 0 1 * * *", zone = "Asia/Calcutta")
+	// @Scheduled(cron = "0 * 7 * * ?")
+	// @Scheduled(fixedRate = 5000)
+	public void deleteTrashShduled() {
+		List<Note> allNote = noteRepsitory.findAll();
+		List<Note> trashNote = allNote.stream().filter(i -> i.isTrash()).collect(Collectors.toList());
+		for (int i = 0; i <= trashNote.size(); i++) {
+			if (trashNote.get(i).getTrashDate().isAfter(LocalDate.now())) {
+				noteRepsitory.delete(trashNote.get(i));
+			}
+		}
+	}
+
+	public Response getArchivedList(String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		List<Note> allNotes = noteRepsitory.findAll();
+		List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
+				.collect(Collectors.toList());
+		System.out.println(userAllNotes);
+		List<Note> reminderAllNotes = userAllNotes.stream().filter(i -> i.isArchieve()).collect(Collectors.toList());
+		System.out.println(reminderAllNotes);
+		if (!reminderAllNotes.isEmpty()) {
+			return new Response(200, "Display Archive List", reminderAllNotes);
+		} else {
+			return new Response(200, "empty List", null);
+		}
+	}
+
+	public Response getTrashList(String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		List<Note> allNotes = noteRepsitory.findAll();
+		List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
+				.collect(Collectors.toList());
+		List<Note> reminderAllNotes = userAllNotes.stream().filter(i -> i.isTrash()).collect(Collectors.toList());
+		if (!reminderAllNotes.isEmpty()) {
+			return new Response(200, "dispaly list", reminderAllNotes);
+		} else {
+			return new Response(200, "empty", null);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.bridgelabz.FundooNote.Util;
 
 import java.io.UnsupportedEncodingException;
+
 import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

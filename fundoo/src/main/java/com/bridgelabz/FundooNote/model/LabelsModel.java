@@ -1,15 +1,9 @@
 package com.bridgelabz.FundooNote.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -88,7 +82,7 @@ public class LabelsModel {
 	}
 
 	public void setCreateDate() {
-		this.createDate = createDate.now();
+		this.createDate = LocalDateTime.now();
 	}
 
 	public LocalDateTime getUpdateDate() {
@@ -96,7 +90,7 @@ public class LabelsModel {
 	}
 
 	public void setUpdateDate() {
-		this.updateDate = updateDate.now();
+		this.updateDate = LocalDateTime.now();
 	}
 
 
