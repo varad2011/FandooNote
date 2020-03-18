@@ -16,12 +16,5 @@ import com.bridgelabz.FundooNote.service.LoginService;
 @RequestMapping("/login")
 public class loginController {
 
-	@Autowired
-	private LoginService loginService;
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/userLogin")
-	public Response loginUser(@RequestBody UserLoginDto loginDto) {
-			Response response = loginService.userLoginCheck(loginDto);
-		return response;
-	}
 }
