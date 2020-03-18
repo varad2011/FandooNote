@@ -3,6 +3,8 @@ package com.bridgelabz.FundooNote.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,39 +25,38 @@ public class LabelController {
 	LabelService labelService;
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/labelCreate")
-	public Response AddLabel(@RequestBody LabelsModel labelModel, @RequestParam String token) {
+	public ResponseEntity<Response> AddLabel(@RequestBody LabelsModel labelModel, @RequestParam String token) {
 		System.out.println(labelModel);
 		Response response = labelService.labelCreate(labelModel, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND);
 	}
 	
 	@PostMapping(value = "/labelDelete" )
-	public Response deleteLabel(@RequestBody LabelsModel labelsModel,@RequestParam String token) {
+	public ResponseEntity<Response> deleteLabel(@RequestBody LabelsModel labelsModel,@RequestParam String token) {
 		Response response = labelService.labelDelete(labelsModel, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND);
 	}
 	
 	@GetMapping(value = "/labelDisplay" )
-	public List<LabelsModel> displayLabel(@RequestParam String token) {
-		
-		return  labelService.displayLabel(token);
+	public ResponseEntity<Response> displayLabel(@RequestParam String token) {
+		return  new ResponseEntity<Response>(labelService.displayLabel(token),HttpStatus.FOUND);
 	}
 	
 	@PostMapping(value = "/labelUpdate" )
-	public Response updateLabel(@RequestBody LabelsModel labelsModel, @RequestParam String token) {
+	public ResponseEntity<Response> updateLabel(@RequestBody LabelsModel labelsModel, @RequestParam String token) {
 		Response response = labelService.labelUpdate(labelsModel, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND);
 	}
 	
 	@PostMapping(value = "/AddNoteToLabel" )
-	public Response AddNoteToLabel(@RequestParam int noteId, @RequestParam int labelId, @RequestParam String token) {
+	public ResponseEntity<Response> AddNoteToLabel(@RequestParam int noteId, @RequestParam int labelId, @RequestParam String token) {
 		Response response = labelService.addNoteToLabel(noteId, labelId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND);
 	}
 	
 	@PostMapping(value = "/AddToLabelToNote" )
-	public Response addToLabelToNote(@RequestParam int noteId, @RequestParam int labelId, @RequestParam String token) {
+	public ResponseEntity<Response> addToLabelToNote(@RequestParam int noteId, @RequestParam int labelId, @RequestParam String token) {
 		Response response = labelService.addLabelToNote(noteId,  labelId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND);
 	}
 }
