@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,113 +31,113 @@ public class NoteController {
 	private NoteService noteService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/noteCreate")
-	public Response createNote(@Valid @RequestBody Note model, @RequestParam String token) {
+	public ResponseEntity<Response> createNote(@Valid @RequestBody Note model, @RequestParam String token) {
 		System.out.println(model.toString());
 		System.out.println(token);
 		Response response = noteService.createNewNote(model, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteNote")
-	public Response deleteNote(@RequestBody NoteDto model, @RequestParam String token) {
+	public ResponseEntity<Response> deleteNote(@RequestBody NoteDto model, @RequestParam String token) {
 		Response response = noteService.deleteNote(model, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateNote")
-	public Response update(@RequestBody NoteDto model, @RequestParam String token) {
+	public ResponseEntity<Response> update(@RequestBody NoteDto model, @RequestParam String token) {
 		Response response = noteService.updateNote(model, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/noteListById")
-	public Response sortList(@RequestParam String token) {
-		return noteService.displayUserNote(token);
+	public ResponseEntity<Response> sortList(@RequestParam String token) {
+		return new ResponseEntity<Response>(noteService.displayUserNote(token),HttpStatus.FOUND);
 	}
 		
 	@RequestMapping(method = RequestMethod.GET, value = "/noteListName")
-	public Response sortListByName(@RequestParam String noteName, @RequestParam String token) {
-		return noteService.displayUserNotesName(noteName, token);
+	public ResponseEntity<Response> sortListByName(@RequestParam String noteName, @RequestParam String token) {
+		return new ResponseEntity<Response>(noteService.displayUserNotesName(noteName, token),HttpStatus.FOUND);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/trash")
-	public Response trash(@RequestParam Long noteId, @RequestParam String token) {
+	public ResponseEntity<Response> trash(@RequestParam Long noteId, @RequestParam String token) {
 		Response response = noteService.storeToTrash(noteId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/trashToList")
-	public Response trashToList(@RequestParam Long noteId, @RequestParam String token) {
+	public ResponseEntity<Response> trashToList(@RequestParam Long noteId, @RequestParam String token) {
 		Response response = noteService.trashToList(noteId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFromTrash")
-	public Response deleteFromTrash(@RequestParam int noteId, @RequestParam String token) {
+	public ResponseEntity<Response> deleteFromTrash(@RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.deleteFromTrash(noteId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 	@RequestMapping(method = RequestMethod.GET, value = "/getTrashList")
-	public Response displayTrashList(@RequestParam String token){
-		return noteService.getTrashList(token);
+	public ResponseEntity<Response> displayTrashList(@RequestParam String token){
+		return new ResponseEntity<Response>(noteService.getTrashList(token),HttpStatus.FOUND);
 	}
 	@RequestMapping(method = RequestMethod.POST, value = "/pinUnpin")
-	public Response pinUnpin(@RequestParam int noteId, @RequestParam String token) {
+	public ResponseEntity<Response> pinUnpin(@RequestParam int noteId, @RequestParam String token) {
 		System.out.println("NOTEiD"+noteId);
 		Response response = noteService.pinUnpin(noteId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addToArchieve")
-	public Response addToArchieve(@RequestParam int noteId, @RequestParam String token) {
+	public ResponseEntity<Response> addToArchieve(@RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.addToArchieve(noteId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/unArchieve")
-	public Response unArchieve(@RequestParam int noteId, @RequestParam String token) {
+	public ResponseEntity<Response> unArchieve(@RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.unArchieveNote(noteId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 	@RequestMapping(method = RequestMethod.GET, value = "/getArchieveList")
-	public Response displayArchievedList(@RequestParam String token){
-		return noteService.getArchivedList(token);
+	public ResponseEntity<Response> displayArchievedList(@RequestParam String token){
+		return new ResponseEntity<Response>(noteService.getArchivedList(token),HttpStatus.FOUND);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/collaborate")
-	public Response collaborator(@RequestParam int noteId, @RequestParam String emailId, @RequestParam String token) {
+	public ResponseEntity<Response> collaborator(@RequestParam int noteId, @RequestParam String emailId, @RequestParam String token) {
 		Response response = noteService.collaborateWithEmailId(noteId, emailId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/collaborateEmailId")
-	public Response collaboratorWithEmailList(@RequestParam int noteId, @RequestParam String emailId, @RequestParam String token) {
+	public ResponseEntity<Response> collaboratorWithEmailList(@RequestParam int noteId, @RequestParam String emailId, @RequestParam String token) {
 		Response response = noteService.collaboratorUsingJoinTable(noteId, emailId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/reminderAdd")
-	public Response reminderAddToNote(@RequestParam int noteId, @RequestParam String datetime,
+	public ResponseEntity<Response> reminderAddToNote(@RequestParam int noteId, @RequestParam String datetime,
 			@RequestParam String token) {
 
 		Response response = noteService.addReminder(noteId, datetime, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/reminderRemove")
-	public Response removeReminderFromNote(@Valid @RequestParam int noteId, @RequestParam String token) {
+	public ResponseEntity<Response> removeReminderFromNote(@Valid @RequestParam int noteId, @RequestParam String token) {
 		Response response = noteService.removeReminder(noteId, token);
-		return response;
+		return new ResponseEntity<Response>(response, HttpStatus.FOUND) ;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getAllReminderNote")
-	public Response getAllReminderNote(@RequestParam String token) {
-		return noteService.getAllReminderList(token);
+	public ResponseEntity<Response> getAllReminderNote(@RequestParam String token) {
+		return new ResponseEntity<Response>(noteService.getAllReminderList(token),HttpStatus.FOUND);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/setProfilePic")
-	public Response removeReminderFromNote(@RequestParam String token, @RequestHeader MultipartFile file) throws IOException {
-		return noteService.uploadProPic(file, token);
+	public ResponseEntity<Response> removeReminderFromNote(@RequestParam String token, @RequestHeader MultipartFile file) throws IOException {
+		return new ResponseEntity<Response>(noteService.uploadProPic(file, token),HttpStatus.FOUND);
 	}
 }
