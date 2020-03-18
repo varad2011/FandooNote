@@ -2,6 +2,7 @@ package com.bridgelabz.FundooNote.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import com.bridgelabz.FundooNote.model.RegistrationModel;
 import com.bridgelabz.FundooNote.repository.LabelRepository;
 import com.bridgelabz.FundooNote.repository.NoteRepository;
 import com.bridgelabz.FundooNote.repository.RegistrationPageRepository;
+import com.bridgelabz.FundooNote.response.RecordNotFoundException;
 import com.bridgelabz.FundooNote.response.Response;
 
 @Service
@@ -32,127 +34,86 @@ public class LabelService {
 
 	// new label create
 	public Response labelCreate(LabelsModel labelModel, String token) {
-
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
-		System.out.println("www");
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-
 		if (registrationModel.isPresent()) {
-			// labelModel.setLabelName(labelDto.getLabelName());
 			labelModel.setCreateDate();
 			labelModel.setRegistrationModel(registrationModel.get());
-			System.out.println(labelModel);
 			labelRepository.save(labelModel);
-
 			return new Response(200, "label Create successfully", null);
-		} else {
-
-			return new Response(401, "not create label", null);
-		}
+		} 
+			throw new RecordNotFoundException( "not create label");
 	}
 
 	// label delete base on label id
 	public Response labelDelete(LabelsModel labelsModel, String token) {
-
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
 		long labelId = labelsModel.getLabelId();
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-
 		if (registrationModel.isPresent()) {
 			labelRepository.deleteById((int) labelId);
 			return new Response(400, "label Delete Successfully", null);
-		} else {
-
-			return new Response(200, "label not delete", null);
-		}
+		} 
+			 throw new RecordNotFoundException( "label not delete");
 	}
 
 	// display list of label
-	public List<LabelsModel> displayLabel(String token) {
-
+	public Response  displayLabel(String token) {
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-
 		if (registrationModel.isPresent()) {
-			List<LabelsModel> labelModel = labelRepository.findAll();
-			//bellow commented code is for arrays.sort() method implementaion to sort list		
-			/*
-			 * Object[] objects = labelModel.toArray(); Arrays.sort(objects);
-			 * 
-			 */
-			return labelModel;
-		} else {
-
-			return null;
-		}
+			List<LabelsModel> labelModelAll = labelRepository.findAll();
+			List<LabelsModel> labelModelUserCreate = labelModelAll.stream().filter(i -> (i.getRegistrationModel().getId() == id)).collect(Collectors.toList());
+			return new Response(401, "label display", labelModelUserCreate );
+		} throw new RecordNotFoundException( "not present");
 	}
 
 	// update label
 	public Response labelUpdate(LabelsModel labelsModel, String token) {
-
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
 		long labelId = labelsModel.getLabelId();
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
 		Optional<LabelsModel> labelModel1 = labelRepository.findBylabelId((int) labelId);
-
 		if (registrationModel.isPresent()) {
 			labelModel1.get().setLabelName(labelsModel.getLabelName());
 			labelModel1.get().setUpdateDate();
 			labelRepository.save(labelModel1.get());
 			return new Response(200, "label update", null);
-		} else {
-
-			return new Response(401, "not update ", null);
-		}
+		} 
+			throw new RecordNotFoundException( "not present");
 	}
 
 	// add note to label
 	public Response addNoteToLabel(int noteId, int labelId, String token) {
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-
 		if (registrationModel.isPresent()) {
-
 			Optional<Note> noteModel = noteRepository.findByNoteId(noteId);
 			Optional<LabelsModel> labelModel = labelRepository.findByLabelId(labelId);
-
 			if (noteModel.isPresent() && labelModel.isPresent()) {
-
 				labelModel.get().getNoteModel().add(noteModel.get());
 				noteRepository.save(noteModel.get());
-
 				return new Response(200, "added to label", null);
 			}
-			return new Response(400, "list or label not avialble", null);
-		} else {
-
-			return new Response(400, "fail to add note ", null);
-		}
+			throw new RecordNotFoundException( "not available in list");
+		} 
+			throw new RecordNotFoundException( "invalid user");
 	}
 
 	// add label to note
 	public Response addLabelToNote(int noteId, int labelId, String token) {
 		Long id = Long.parseLong(tokenGeneratorDecoder.decodeToken(token));
 		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-
 		if (registrationModel.isPresent()) {
-			
 			Optional<Note> noteModel = noteRepository.findByNoteId(noteId);
 			Optional<LabelsModel> labelModel = labelRepository.findByLabelId(labelId);
-
 			if (noteModel.isPresent() && labelModel.isPresent()) {
-
 				noteModel.get().getLabelModel().add(labelModel.get());
-			
 				noteRepository.save(noteModel.get());
-				
 				return new Response(200, "added to note", null);
 			}
-			return new Response(400, "list or label not avialble", null);
+			throw new RecordNotFoundException( "not available list ");
 
-		} else {
-
-			return new Response(400, "fail to add note ", null);
-		}
+		} 	throw new RecordNotFoundException( "invalid user");
 	}
 }
