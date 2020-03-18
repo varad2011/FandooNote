@@ -21,15 +21,5 @@ public class ForgetPasswordController {
 	ForgetPasswordService forgetPasswordService;
 
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/resetLink")
-	public Response linksendToResetPassword(@RequestBody ForgetPasswordDto passwordDto) {
-		Response response = forgetPasswordService.checkUserEmailId(passwordDto);
-		return response;
-	}
-	@RequestMapping(method = RequestMethod.POST, value = "/resetemailId")
-	public Response forgetUserPassword(@RequestBody UserLoginDto resetPasswordDto) {
-		System.out.println(resetPasswordDto.toString());
-		Response response = forgetPasswordService.updatePassword(resetPasswordDto);
-		return response;
-	}
+	
 }
