@@ -29,7 +29,7 @@ public class CustomeExceptionHandler extends ResponseEntityExceptionHandler {
 	public final ResponseEntity<Object> handleUserNotFoundException(RecordNotFoundException ex, WebRequest request) {
 		List<String> details = new ArrayList<>();
 		details.add(ex.getLocalizedMessage());
-		ErrorResponse error = new ErrorResponse("Record Not Found", details);
+		ErrorResponse error = new ErrorResponse(ex.getMessage(), details);
 		return new ResponseEntity(error, HttpStatus.NOT_FOUND);
 	}
 
