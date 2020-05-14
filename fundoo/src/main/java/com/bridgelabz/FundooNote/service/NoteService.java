@@ -21,9 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bridgelabz.FundooNote.Util.TokenGeneratorDecoder;
 import com.bridgelabz.FundooNote.dto.NoteDto;
 import com.bridgelabz.FundooNote.model.CollaboratorOut;
+import com.bridgelabz.FundooNote.model.LabelsModel;
 import com.bridgelabz.FundooNote.model.Note;
 import com.bridgelabz.FundooNote.model.RegistrationModel;
 import com.bridgelabz.FundooNote.repository.CollaboratorRepository;
+import com.bridgelabz.FundooNote.repository.LabelRepository;
 import com.bridgelabz.FundooNote.repository.NoteRepository;
 import com.bridgelabz.FundooNote.repository.RegistrationPageRepository;
 import com.bridgelabz.FundooNote.response.RecordNotFoundException;
@@ -90,16 +92,16 @@ public class NoteService {
 	public Response updateNote(NoteDto model, String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		long noteId = model.getNoteId();
-			Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
-			Optional<Note> noteModel = noteRepsitory.findById((int) noteId);
-			if (registrationModel.isPresent()) {
-				noteModel.get().setTitle(model.getTitle());
-				noteModel.get().setContent(model.getContent());
-				noteModel.get().setAtModified();
-				noteRepsitory.save(noteModel.get());
-				return new Response(200, "update successfully", token);
-			}
-			throw new RecordNotFoundException( "envalid token");
+		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
+		Optional<Note> noteModel = noteRepsitory.findById((int) noteId);
+		if (registrationModel.isPresent()) {
+			noteModel.get().setTitle(model.getTitle());
+			noteModel.get().setContent(model.getContent());
+			noteModel.get().setAtModified();
+			noteRepsitory.save(noteModel.get());
+			return new Response(200, "update successfully", token);
+		}
+		throw new RecordNotFoundException("envalid token");
 	}
 
 	// display all user create Notes
@@ -110,9 +112,29 @@ public class NoteService {
 			List<Note> noteList = noteRepsitory.findAll();
 			List<Note> noteModel1 = noteList.stream().filter(t -> (t.getModel().getId()) == (id))
 					.collect(Collectors.toList());
-			return new Response(200, "display Note successfully", noteModel1);
-		} 
-			throw new RecordNotFoundException( "Empty List");
+			List<Note> noteListWithoutPin = noteModel1.stream().filter(i -> i.isPinUnpin() == false)
+					.collect(Collectors.toList());
+			List<Note> noteListWithoutTrashNote = noteListWithoutPin.stream().filter(i -> i.isTrash() == false)
+					.collect(Collectors.toList());
+			List<Note> noteListWithoutArchiveNotes = noteListWithoutTrashNote.stream()
+					.filter(i -> i.isArchieve() == false).collect(Collectors.toList());
+			return new Response(200, "display Note successfully", noteListWithoutArchiveNotes);
+		}
+		throw new RecordNotFoundException("Empty List");
+	}
+
+	public Response getListOfNoteBySearchField(String token, String typeText) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> user = registrationPagerepository.findById(id);
+		if (user.isPresent()) {
+			List<Note> allNoteList = noteRepsitory.findAll();
+			List<Note> loginUserCreateNoteList = allNoteList.stream().filter(t -> (t.getModel().getId()) == (id))
+					.collect(Collectors.toList());
+			List<Note> searchNoteList = loginUserCreateNoteList.parallelStream()
+					.filter(i -> (!i.isTrash()) && (i.getTitle().indexOf(typeText) >= 0)).collect(Collectors.toList());
+			return new Response(200, "display Serach Note successfully", searchNoteList);
+		}
+		throw new RecordNotFoundException("User not present ");
 	}
 
 	// Sort note by note name
@@ -126,8 +148,8 @@ public class NoteService {
 			List<Note> noteModel1 = userNoteList.stream().filter(t -> t.getTitle().equals(name))
 					.collect(Collectors.toList());
 			return new Response(200, "display Note successfully", noteModel1);
-		} 
-		throw new RecordNotFoundException( "Empty List");
+		}
+		throw new RecordNotFoundException("Empty List");
 	}
 
 	// store note to trash
@@ -143,8 +165,8 @@ public class NoteService {
 			noteModel.get().setAtModified();
 			noteRepsitory.save(noteModel.get());
 			return new Response(200, "trash successfully", null);
-		} 
-			throw new RecordNotFoundException( "not trush");
+		}
+		throw new RecordNotFoundException("not trush");
 	}
 
 	// untrash note
@@ -157,8 +179,8 @@ public class NoteService {
 			noteModel.get().setAtModified();
 			noteRepsitory.save(noteModel.get());
 			return new Response(200, "trash to list store successfully", null);
-		} 
-			throw new RecordNotFoundException( "not remove from trush ");
+		}
+		throw new RecordNotFoundException("not remove from trush ");
 	}
 
 	// delete notes from trash permanent deleted data
@@ -169,8 +191,8 @@ public class NoteService {
 		if ((registrationModel.isPresent()) && (noteModel.get().isTrash())) {
 			noteRepsitory.deleteById(noteId);
 			return new Response(200, "delete successfully from trash", null);
-		} 
-			throw new RecordNotFoundException( "not delete from trush");
+		}
+		throw new RecordNotFoundException("not delete from trush");
 	}
 
 	// pin unpin notes
@@ -187,7 +209,8 @@ public class NoteService {
 			}
 			noteRepsitory.save(noteModel.get());
 			return new Response(200, "note pin Status change", null);
-		} throw new RecordNotFoundException( "status not change");
+		}
+		throw new RecordNotFoundException("status not change");
 	}
 
 	// note added to archieve
@@ -205,7 +228,7 @@ public class NoteService {
 			noteRepsitory.save(noteModel.get());
 			return new Response(200, "note added to archive", null);
 		}
-			throw new RecordNotFoundException( "not added to archive");
+		throw new RecordNotFoundException("not added to archive");
 	}
 
 	// note unArchieve
@@ -222,7 +245,7 @@ public class NoteService {
 			noteRepsitory.save(noteModel.get());
 			return new Response(200, " unArchieve successfully", null);
 		}
-			throw new RecordNotFoundException( "not unArchive");
+		throw new RecordNotFoundException("not unArchive");
 	}
 
 	// check boolean condition --emailId is already collaborate or not
@@ -264,9 +287,10 @@ public class NoteService {
 		}
 		throw new RecordNotFoundException("user not available");
 	}
+
 	// added reminder to note
 	public Response addReminder(int noteId, String datetime, String token) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		LocalDateTime dateTime = LocalDateTime.parse(datetime, formatter);
 		Optional<RegistrationModel> UserExist = registrationPagerepository.findById(id);
@@ -276,8 +300,8 @@ public class NoteService {
 			noteCheck.get().setReminderDatTime(dateTime);
 			noteRepsitory.save(noteCheck.get());
 			return new Response(200, "reminder added successfully", null);
-		} 
-			throw new RecordNotFoundException( "user not present");
+		}
+		throw new RecordNotFoundException("user not present");
 	}
 
 	// remove reminder from note
@@ -291,41 +315,67 @@ public class NoteService {
 			noteRepsitory.save(noteCheck.get());
 			return new Response(200, "note reminder remove successfully", null);
 		}
-			throw new RecordNotFoundException( "user not present");
+		throw new RecordNotFoundException("user not present");
 	}
 
-	// reminder set notes display for login user
-	
+	// reminder set unpin notes display for login user
+
 	public Response getAllReminderList(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		if (checkUserExit(token)) {
 			List<Note> allNotes = noteRepsitory.findAll();
-			List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
+			List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id) && (!i.isPinUnpin()))
 					.collect(Collectors.toList());
-			List<Note> reminderSetNotes = userAllNotes.stream().filter(i -> (i.isNoteReminder()))
+			List<Note> reminderSetNotes = userAllNotes.stream().filter(i -> (i.isNoteReminder()) && (!i.isTrash()))
 					.collect(Collectors.toList());
-			return new Response(400, "use is not present in dataBase", reminderSetNotes);
-		} 
-			throw new RecordNotFoundException( "list is empty");
+			return new Response(200, "use is not present in dataBase", reminderSetNotes);
+		}
+		throw new RecordNotFoundException("list is empty");
+	}
+
+	// reminder set pin notes
+	public Response AllReminderPinNoteList(String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		if (checkUserExit(token)) {
+			List<Note> allNotes = noteRepsitory.findAll();
+			List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id) && (i.isPinUnpin()))
+					.collect(Collectors.toList());
+			List<Note> reminderSetNotes = userAllNotes.stream().filter(i -> (i.isNoteReminder()) && (!i.isTrash()))
+					.collect(Collectors.toList());
+			return new Response(200, "use is not present in dataBase", reminderSetNotes);
+		}
+		throw new RecordNotFoundException("list is empty");
 	}
 
 	// remind notes to user when settime == reminder time;
-
-	public List<Note> remindNotesToUser(String token) {
+	public Response remindNotesToUser(String token) {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
 		List<Note> allNotes = noteRepsitory.findAll();
-		List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
+		List<Note> userAllNotes = allNotes.stream()
+				.filter(i -> (i.getModel().getId()) == (id) && !i.isTrash() && i.isNoteReminder())
 				.collect(Collectors.toList());
 		List<Note> reminderAllNotes = userAllNotes.stream()
-				.filter(i -> (i.getReminderDatTime()).equals(LocalDateTime.now())).collect(Collectors.toList());
+				.filter(i -> i.getReminderDatTime().isBefore(LocalDateTime.now())).collect(Collectors.toList());
 		if (checkUserExit(token)) {
-			if (!reminderAllNotes.isEmpty()) {
-				return reminderAllNotes;
-			} else {
-				return null;
-			}
+			return new Response(200, " reminder complete note list count ", reminderAllNotes.size());
 		} else {
-			return null;
+			return new Response(200, "user not exits", null);
+		}
+	}
+	
+	//get all reminder complete note list 
+	public Response getListOfAllReminderCompleteNotes(String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		List<Note> allNotes = noteRepsitory.findAll();
+		List<Note> userAllNotes = allNotes.stream()
+				.filter(i -> (i.getModel().getId()) == (id) && !i.isTrash() && i.isNoteReminder())
+				.collect(Collectors.toList());
+		List<Note> reminderAllNotes = userAllNotes.stream()
+				.filter(i -> i.getReminderDatTime().isBefore(LocalDateTime.now())).collect(Collectors.toList());
+		if (checkUserExit(token)) {
+			return new Response(200, " reminder complete note list  ", reminderAllNotes);
+		} else {
+			return new Response(200, "user not exits", null);
 		}
 	}
 
@@ -372,6 +422,7 @@ public class NoteService {
 
 	public Response uploadProPic(MultipartFile file, String token) throws IOException {
 		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		System.out.println("file" + file.isEmpty());
 		Optional<RegistrationModel> loginUser = registrationPagerepository.findById(id);
 		if (checkUserExit(token)) {
 			File uploadFile = new File(file.getOriginalFilename());
@@ -386,10 +437,10 @@ public class NoteService {
 			registrationPagerepository.save(loginUser.get());
 			return new Response(200, "imageUploaded successfully", null);
 		}
-			throw new RecordNotFoundException( "some issues are here");
+		throw new RecordNotFoundException("some issues are here");
 	}
 
-	@Scheduled(cron = "0 0 1 * * *", zone = "Asia/Calcutta")
+//	@Scheduled(cron = "0 0 1 * * *", zone = "Asia/Calcutta")
 	// @Scheduled(cron = "0 * 7 * * ?")
 	// @Scheduled(fixedRate = 5000)
 	public void deleteTrashShduled() {
@@ -408,10 +459,11 @@ public class NoteService {
 		List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
 				.collect(Collectors.toList());
 		List<Note> reminderAllNotes = userAllNotes.stream().filter(i -> i.isArchieve()).collect(Collectors.toList());
+		List<Note> getListOfArchieve = reminderAllNotes.stream().filter(i -> !i.isTrash()).collect(Collectors.toList());
 		if (!reminderAllNotes.isEmpty()) {
-			return new Response(200, "Display Archive List", reminderAllNotes);
-		} 
-			throw new RecordNotFoundException( "empty");
+			return new Response(200, "Display Archive List", getListOfArchieve);
+		}
+		throw new RecordNotFoundException("empty");
 	}
 
 	public Response getTrashList(String token) {
@@ -420,9 +472,58 @@ public class NoteService {
 		List<Note> userAllNotes = allNotes.stream().filter(i -> (i.getModel().getId()) == (id))
 				.collect(Collectors.toList());
 		List<Note> reminderAllNotes = userAllNotes.stream().filter(i -> i.isTrash()).collect(Collectors.toList());
-		if (!reminderAllNotes.isEmpty()) {
-			return new Response(200, "dispaly list", reminderAllNotes);
-		} 
-		throw new RecordNotFoundException( "empty");
+//		if (!reminderAllNotes.isEmpty()) {
+		return new Response(200, "dispaly list", reminderAllNotes);
+//		}
+////		return new Response(200, "dispaly list", null);
+//		throw new RecordNotFoundException("empty");
+	}
+
+	public Response getSingleNote(int id, String token) {
+		long userId = Long.parseLong(tokenDecoder.decodeToken(token));
+
+		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(userId);
+		if (checkUserExit(token)) {
+			Optional<Note> singleNote = noteRepsitory.findById(id);
+			if (singleNote.isPresent()) {
+				System.out.println("sigle note " + singleNote.get());
+				return new Response(200, "saveNote", singleNote.get());
+			}
+			throw new RecordNotFoundException("note not present");
+		}
+		throw new RecordNotFoundException("envalid token");
+	}
+
+	public Response setColor(Note noteModel, String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
+		long noteId = noteModel.getNoteId();
+		if (checkUserExit(token)) {
+			Optional<Note> note = noteRepsitory.findById((int) noteId);
+			note.get().setBackgroundColor(noteModel.getBackgroundColor());
+			noteRepsitory.save(note.get());
+			return new Response(200, "colorChangeSuccessFully", null);
+		}
+		return new Response(200, "not valid token", null);
+	}
+
+	public Response getAllPinNotes(String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> registrationModel = registrationPagerepository.findById(id);
+		if (checkUserExit(token)) {
+			List<Note> getAllNotes = noteRepsitory.findAll();
+			List<Note> getpinNotes = getAllNotes.stream().filter(i -> i.isPinUnpin() == true)
+					.collect(Collectors.toList());
+			return new Response(200, "displaypinNotes", getpinNotes);
+		}
+		return new Response(200, "not valid use", null);
+	}
+
+	public Response deleteAllFromTrash(String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		List<Note> allNotes = noteRepsitory.findAll();
+		List<Note> trashNote = allNotes.stream().filter(i -> i.getModel().getId() == (id) && i.isTrash()).collect(Collectors.toList());
+		noteRepsitory.deleteInBatch(trashNote);
+		return new Response(200, "delete all  user notes ", null);
 	}
 }
