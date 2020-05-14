@@ -37,7 +37,15 @@ public class Note {
 	private boolean archievePin; 
 	private boolean noteReminder;
 	private LocalDateTime reminderDatTime; 
+	private String backgroundColor;
 	
+	public String getBackgroundColor() {
+		return backgroundColor;
+	}
+	public void setBackgroundColor(String backgroundColor) {
+		this.backgroundColor = backgroundColor;
+	}
+
 	@ManyToOne
 	@JoinColumn(name = "id") 
 	private RegistrationModel model;
