@@ -21,8 +21,9 @@ public class LabelsModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int  labelId;
-	private String labelName;
+	
 	@NotBlank
+	private String labelName;
 	private LocalDateTime createDate;
 	private LocalDateTime updateDate;
 	
