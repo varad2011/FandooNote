@@ -42,6 +42,9 @@ public class RegistrationService {
 
 	@Autowired
 	private TokenGeneratorDecoder tokenGeneratorDecoder;
+	
+	@Autowired
+	private TokenGeneratorDecoder tokenDecoder;
 
 	@Value("${userLoginSuccessMsg}")
 	private String loginSuccMsg;
@@ -56,7 +59,7 @@ public class RegistrationService {
 		if (!newModel.isPresent()) {
 			model.setPassword(passwordEncoder.encode(model.getPassword()));
 			registrationRepository.save(model);
-			email.sendEmail(null, "Registration done successfully", emailId, null);
+			//email.sendEmail(null, "Registration done successfully", emailId, null);
 			return new Response(200, "use Registration success", null);
 		}
 		throw new RecordNotFoundException("unsuccessRegistration");
@@ -92,5 +95,12 @@ public class RegistrationService {
 		registrationRepository.save(model);
 		System.out.println(model);
 		return new Response(200, "password reset successfully", null);
+	}
+
+	public Response updateProfilePic(String token) {
+		long id = Long.parseLong(tokenDecoder.decodeToken(token));
+		Optional<RegistrationModel> user = registrationPageRepository.findById(id);
+		String profilePicUrl = user.get().getProfilePic();
+		return new Response(200, "profile pic set successfully", profilePicUrl );
 	}
 }
