@@ -15,6 +15,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.elasticsearch.annotations.Document;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
@@ -48,24 +51,28 @@ public class Note {
 
 	@ManyToOne
 	@JoinColumn(name = "id") 
+	@JsonIgnore
 	private RegistrationModel model;
 	 
 	@ManyToMany(cascade=CascadeType.ALL)
 	@JoinTable(name="emailJoin", joinColumns=@JoinColumn(name="noteId")
 	, inverseJoinColumns=@JoinColumn(name="id")) 
 	@JsonIgnoreProperties(value = "noteModel")
+	@JsonIgnore
 	private List<RegistrationModel> registrationModel;
 	
 	@ManyToMany
 	@JoinTable(name="LableJoin", joinColumns=@JoinColumn(name="noteId")
 	, inverseJoinColumns=@JoinColumn(name="labelId")) 
 	@JsonIgnoreProperties(value = "noteModel")
+	@JsonIgnore
 	private List<LabelsModel> labelModel;
 	  
 	@ManyToMany
 	@JoinTable(name="colJoin", joinColumns=@JoinColumn(name="noteId")
 	, inverseJoinColumns=@JoinColumn(name="colId")) 
 	@JsonIgnoreProperties(value = "noteList")
+	@JsonIgnore
 	private List<CollaboratorOut> collaboratorOutsList;
 	
 	public List<CollaboratorOut> getCollaboratorOutsList() {
