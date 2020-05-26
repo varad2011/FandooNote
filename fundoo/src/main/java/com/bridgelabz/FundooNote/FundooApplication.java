@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -16,16 +17,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 @EnableSwagger2
 //@EnableScheduling
+@ComponentScan
 public class FundooApplication {
-//	@Autowired
-//	ServerVertical simpleVertx;
+	@Autowired
+	ServerVertical simpleVertx;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(FundooApplication.class, args);
 	}
 
-//	@PostConstruct
-//	public void deployVerticle() {
-//	Vertx.vertx().deployVerticle(simpleVertx);
-//	}
+	@PostConstruct
+	public void deployVerticle() {
+	Vertx.vertx().deployVerticle(simpleVertx);
+	}
 }
