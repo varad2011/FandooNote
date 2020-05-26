@@ -1,0 +1,20 @@
+schema {
+	query :Query
+}
+
+type Query {
+	getAllNote: [Note]
+}
+
+
+type Note {
+	noteId: Int
+	title: String
+	content: String
+	trash: Boolean
+	pinUnpin: Boolean
+	archievePin: Boolean
+	noteReminder: Boolean
+	backgroundColor: String
+	atCreated: String 
+}
