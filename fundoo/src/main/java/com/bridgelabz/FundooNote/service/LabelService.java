@@ -104,15 +104,13 @@ public class LabelService {
 			List<LabelsModel> labelModelUserCreate = labelModelAll.stream()
 					.filter(i -> (i.getRegistrationModel().getId() == id)).collect(Collectors.toList());
 			List<LabelsModel> sortLabel = new ArrayList<LabelsModel>();
+			sortLabel.addAll(labelModelUserCreate);
 			for (int j = 0; j < labelModelUserCreate.size(); j++) {
 				for (int j2 = 0; j2 < labelModelUserCreate.get(j).getNoteModel().size(); j2++) {
-					if((labelModelUserCreate.get(j).getNoteModel().get(j2).getNoteId()) != noteId) {
-//						sortLabel.add(labelModelUserCreate.get(j));
-						System.out.println("label"+labelModelUserCreate.get(j));
-						continue;
+					if((labelModelUserCreate.get(j).getNoteModel().get(j2).getNoteId()) == noteId) {
+						sortLabel.remove(labelModelUserCreate.get(j));
 					}
 				}
-				sortLabel.add(labelModelUserCreate.get(j));
 			}
 			return new Response(200, "label display", sortLabel);
 		}
