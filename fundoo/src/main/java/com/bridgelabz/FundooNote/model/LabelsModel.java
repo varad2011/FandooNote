@@ -94,16 +94,10 @@ public class LabelsModel {
 		this.updateDate = LocalDateTime.now();
 	}
 
-
-
 	@Override
 	public String toString() {
 		return "LabelsModel [labelId=" + labelId + ", labelName=" + labelName + ", createDate=" + createDate
 				+ ", updateDate=" + updateDate + ", registrationModel=" + registrationModel + ", noteModel=" + noteModel
 				+ "]";
 	}
-
-	
-
-	
 }
